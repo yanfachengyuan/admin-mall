@@ -12,12 +12,12 @@
     <el-card class="box-card">
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="请输入内容" v-model="queryInfo.query">
-            <el-button slot="append" icon="el-icon-search" @click="getUsers" @enter="getUsers"></el-button>
+          <el-input placeholder="请输入内容" v-model="queryInfo.query" clearable>
+            <el-button slot="append" icon="el-icon-search" @click="getUsers"></el-button>
           </el-input>
         </el-col>
         <el-col :span="8">
-          <el-button type="primary">添加用户</el-button>
+          <el-button type="primary" @click="dialogVisible=true">添加用户</el-button>
         </el-col>
       </el-row>
       <el-table :data="tableData" style="width: 100%" border stripe>
@@ -62,6 +62,26 @@
         :page-size="2"
         @current-change="handleCurrentChange"
       ></el-pagination>
+      <el-dialog title="提示" :visible.sync="dialogVisible" width="40%">
+        <el-form :model="addForm" :rules="addRules" ref="addForm" label-width="60px">
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="addForm.username"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="addForm.password"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="addForm.email"></el-input>
+          </el-form-item>
+          <el-form-item label="手机" prop="moble">
+            <el-input v-model="addForm.moble"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -73,10 +93,18 @@ export default {
       queryInfo: {
         query: "",
         pagenum: 1,
-        pagesize: 2,
+        pagesize: 2
       },
       total: 0,
       tableData: [],
+      dialogVisible: false,
+      addForm: {
+        username: "",
+        password: "",
+        email: "",
+        moble: ""
+      },
+      addRules: {}
     };
   },
   created() {
@@ -107,11 +135,11 @@ export default {
       );
       this.$message({
         message: data.meta.msg,
-        type: "success",
+        type: "success"
       });
       console.log(data);
-    },
-  },
+    }
+  }
 };
 </script>
 

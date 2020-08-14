@@ -12,7 +12,6 @@
         <div class="collapse" @click="toggleCollapse">|||</div>
         <el-col>
           <el-menu
-            default-active="2"
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
@@ -22,6 +21,8 @@
             :unique-opened="true"
             :collapse="iscollapse"
             :collapse-transition="false"
+            :default-active="$route.path"
+            router
           >
             <el-submenu :index="item.id+''" v-for="item in menu" :key="item.id">
               <template slot="title">
@@ -29,7 +30,7 @@
                 <span>{{item.authName}}</span>
               </template>
               <el-menu-item
-                :index="subItem.id+''"
+                :index="'/'+subItem.path"
                 v-for="subItem in item.children"
                 :key="subItem.id"
               >
@@ -43,14 +44,6 @@
         </el-col>
       </el-aside>
       <el-main>
-        <div class="bread">
-          <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-            <el-breadcrumb-item>
-              <a href="/">活动管理</a>
-            </el-breadcrumb-item>
-          </el-breadcrumb>
-        </div>
         <router-view></router-view>
       </el-main>
     </el-container>
@@ -62,14 +55,15 @@ export default {
   data() {
     return {
       menu: [],
-      iconObj:{
-        '125':'el-icon-s-custom',
-        '103':'el-icon-set-up',
-        '101':'el-icon-shopping-bag-1',
-        '102':'el-icon-s-order',
-        '145':'el-icon-s-marketing'
+      iconObj: {
+        "125": "el-icon-s-custom",
+        "103": "el-icon-set-up",
+        "101": "el-icon-shopping-bag-1",
+        "102": "el-icon-s-order",
+        "145": "el-icon-s-marketing",
       },
-      iscollapse:true
+      iscollapse: false,
+      pathName: "",
     };
   },
   methods: {
@@ -79,7 +73,6 @@ export default {
     },
     async getMenus() {
       let { data } = await this.$axios.get("menus");
-      console.log(data);
       this.menu = data.data;
     },
     handleOpen(key, keyPath) {
@@ -88,12 +81,13 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
-    toggleCollapse(){
-      this.iscollapse=!this.iscollapse
+    toggleCollapse() {
+      this.iscollapse = !this.iscollapse;
     }
   },
   created() {
     this.getMenus();
+    this.pathName = window.sessionStorage.getItem("path");
   },
 };
 </script>
@@ -119,10 +113,10 @@ export default {
   }
   .el-aside {
     background-color: #333744;
-    .el-menu{
+    .el-menu {
       border-right: none;
     }
-    .collapse{
+    .collapse {
       background-color: #4a5064;
       height: 30px;
       line-height: 30px;

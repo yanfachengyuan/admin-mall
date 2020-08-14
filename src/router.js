@@ -15,13 +15,14 @@ const router = new Router({
     {
       path: '/home',
       component: () => import('./views/Home'),
-      children: [{
-        path: '/home',
-        redirect: '/welcome'
-      },
+      redirect:'/welcome',
+      children: [
       {
         path: '/welcome',
         component: () => import('./components/Welcome')
+      },{
+        path: '/users',
+        component: () => import('./components/User')
       }]
     }
   ]

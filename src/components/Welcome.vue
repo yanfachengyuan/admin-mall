@@ -1,5 +1,5 @@
 <template>
-  <h1>Welcome E-commerce management system!</h1>
+  <h1>欢迎来到祖安！</h1>
 </template>
 
 <script>

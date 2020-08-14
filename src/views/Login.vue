@@ -6,10 +6,10 @@
       </div>
       <div class="login_form">
         <el-form ref="loginForm" :model="form" :rules="loginRules">
-          <el-form-item class="info" prop="loginName">
+          <el-form-item class="info" prop="username">
             <el-input v-model="form.username" prefix-icon="el-icon-user"></el-input>
           </el-form-item>
-          <el-form-item class="info" prop="loginPsd">
+          <el-form-item class="info" prop="password">
             <el-input v-model="form.password" prefix-icon="el-icon-lock" type="password"></el-input>
           </el-form-item>
           <el-form-item class="btns">
@@ -28,23 +28,23 @@ export default {
     return {
       form: {
         username: "admin",
-        password: "123456",
+        password: "123456"
       },
       loginRules: {
-        loginName: [
+        username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
+          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
         ],
-        loginPsd: [
+        password: [
           { required: true, message: "请输入密码", trigger: "blur" },
           {
             min: 6,
             max: 10,
             message: "长度在 6 到 10 个字符",
-            trigger: "blur",
-          },
-        ],
-      },
+            trigger: "blur"
+          }
+        ]
+      }
     };
   },
   methods: {
@@ -53,14 +53,14 @@ export default {
       window.sessionStorage.setItem("token", data.data.token);
       this.$message({
         message: data.meta.msg,
-        type: "success",
+        type: "success"
       });
       this.$router.push("/home");
     },
-    reset(){
-      console.log(this.ref)
+    reset() {
+      console.log(this.ref);
     }
-  },
+  }
 };
 </script>
 

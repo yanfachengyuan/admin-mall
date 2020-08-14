@@ -63,7 +63,7 @@
         @current-change="handleCurrentChange"
       ></el-pagination>
       <el-dialog title="提示" :visible.sync="dialogVisible" width="40%">
-        <el-form :model="addForm" :rules="addRules" ref="addForm" label-width="60px">
+        <el-form :model="addForm" :rules="addRules" ref="addForm" label-width="80px">
           <el-form-item label="用户名" prop="username">
             <el-input v-model="addForm.username"></el-input>
           </el-form-item>
@@ -104,7 +104,24 @@ export default {
         email: "",
         moble: ""
       },
-      addRules: {}
+      addRules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+        ],
+        password: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 6, max: 15, message: "长度在 6 到 15 个字符", trigger: "blur" }
+        ],
+        email: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+        ],
+        moble: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+        ]
+      }
     };
   },
   created() {

@@ -13,8 +13,16 @@ const router = new Router({
       component: () => import('./views/Login')
     },
     {
-      path:'/home',
-      component:()=>import('./views/Home')
+      path: '/home',
+      component: () => import('./views/Home'),
+      children: [{
+        path: '/home',
+        redirect: '/welcome'
+      },
+      {
+        path: '/welcome',
+        component: () => import('./components/Welcome')
+      }]
     }
   ]
 })

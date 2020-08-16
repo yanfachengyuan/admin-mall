@@ -16,7 +16,41 @@
         </el-col>
       </el-row>
       <el-table :data="rolesLists" border stripe>
-        <el-table-column type="expand"></el-table-column>
+        <el-table-column type="expand">
+          <template slot-scope="scope">
+            <el-row
+              :class="['bdbottom',i===0?'bdtop':'','center']"
+              v-for="(item,i) in scope.row.children"
+              :key="item.id"
+            >
+              <el-col :span="5">
+                <el-tag class="el-tagM" closable>{{item.authName}}</el-tag>
+                <i class="el-icon-caret-right"></i>
+              </el-col>
+              <el-col :span="19">
+                <el-row
+                  :class="[m===0?'':'bdtop','center']"
+                  v-for="(subItem,m) in item.children"
+                  :key="subItem.id"
+                >
+                  <el-col :span="6">
+                    <el-tag closable class="el-tagM" type="success">{{subItem.authName}}</el-tag>
+                    <i class="el-icon-caret-right"></i>
+                  </el-col>
+                  <el-col :span="18">
+                    <el-tag
+                      type="warning"
+                      class="el-tagM"
+                      v-for="subSubItem in subItem.children"
+                      :key="subSubItem.id"
+                      closable
+                    >{{subSubItem.authName}}</el-tag>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+          </template>
+        </el-table-column>
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="roleName" label="角色名称"></el-table-column>
         <el-table-column prop="roleDesc" label="角色描述"></el-table-column>
@@ -123,5 +157,18 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less" scoped>
+.el-tagM {
+  margin: 7px;
+}
+.bdtop {
+  border-top: 1px solid #eee;
+}
+.bdbottom {
+  border-bottom: 1px solid #eee;
+}
+.center {
+  display: flex;
+  align-items: center;
+}
 </style>

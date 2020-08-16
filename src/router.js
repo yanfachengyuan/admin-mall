@@ -15,15 +15,21 @@ const router = new Router({
     {
       path: '/home',
       component: () => import('./views/Home'),
-      redirect:'/welcome',
+      redirect: '/welcome',
       children: [
-      {
-        path: '/welcome',
-        component: () => import('./components/Welcome')
-      },{
-        path: '/users',
-        component: () => import('./components/User')
-      }]
+        {
+          path: '/welcome',
+          component: () => import('./components/Welcome')
+        }, {
+          path: '/users',
+          component: () => import('./components/User')
+        }, {
+          path: '/rights',
+          component: () => import('./components/Rights')
+        }, {
+          path: '/roles',
+          component: () => import('./components/Roles')
+        }]
     }
   ]
 })

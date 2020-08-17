@@ -15,7 +15,7 @@
           <el-button @click="addRoles=true">添加角色</el-button>
         </el-col>
       </el-row>
-      <el-table :data="rolesLists" border stripe>
+      <el-table :data="rolesLists" border stripe :v-loading="true">
         <el-table-column type="expand">
           <template slot-scope="scope">
             <el-row
@@ -24,7 +24,11 @@
               :key="item.id"
             >
               <el-col :span="5">
-                <el-tag class="el-tagM" closable>{{item.authName}}</el-tag>
+                <el-tag
+                  class="el-tagM"
+                  closable
+                  @close="removeRoles(scope.row,item.id)"
+                >{{item.authName}}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
@@ -34,7 +38,12 @@
                   :key="subItem.id"
                 >
                   <el-col :span="6">
-                    <el-tag closable class="el-tagM" type="success">{{subItem.authName}}</el-tag>
+                    <el-tag
+                      closable
+                      @close="removeRoles(scope.row,subItem.id)"
+                      class="el-tagM"
+                      type="success"
+                    >{{subItem.authName}}</el-tag>
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <el-col :span="18">
@@ -44,6 +53,7 @@
                       v-for="subSubItem in subItem.children"
                       :key="subSubItem.id"
                       closable
+                      @close="removeRoles(scope.row,subSubItem.id)"
                     >{{subSubItem.authName}}</el-tag>
                   </el-col>
                 </el-row>
@@ -63,7 +73,12 @@
               size="mini"
               @click="deleteRoles(scope.row.id)"
             >删除</el-button>
-            <el-button icon="el-icon-setting" type="warning" size="mini">分配权限</el-button>
+            <el-button
+              icon="el-icon-setting"
+              type="warning"
+              size="mini"
+              @click="showSetRights(scope.row)"
+            >分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -81,6 +96,21 @@
           <el-button type="primary" @click="addRolesCon">确 定</el-button>
         </span>
       </el-dialog>
+      <el-dialog title="提示" :visible.sync="setRights" width="50%">
+        <el-tree
+          ref="treeRef"
+          :data="rightsList"
+          :props="rightsListProp"
+          show-checkbox
+          node-key="id"
+          default-expand-all
+          :default-checked-keys="defKeys"
+        ></el-tree>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="setRights = false">取 消</el-button>
+          <el-button type="primary" @click="setRightsCon">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -91,53 +121,113 @@ export default {
     return {
       rolesLists: [],
       addRoles: false,
+      setRights: false,
+      rightsList: [],
+      defKeys: [],
+      rightsListProp: {
+        label: "authName",
+        children: "children",
+      },
       addRolesForm: {
         roleName: "",
-        roleDesc: ""
+        roleDesc: "",
       },
       addRolesRules: {
         roleName: [
           {
             required: true,
             message: "请输入角色名称",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 3,
             max: 10,
             message: "请输入3-10个字符",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         roleDesc: [
           {
             required: true,
             message: "请输入角色描述",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 3,
             max: 10,
             message: "请输入3-10个字符",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
+      roleId: "",
     };
   },
   methods: {
+    filterRights(node, arr) {
+      if (!node.children) {
+        return arr.push(node.id);
+      }
+      node.children.forEach((item) => {
+        this.filterRights(item, arr);
+      });
+    },
+    async showSetRights(role) {
+      this.roleId = role.id;
+      this.defKeys = [];
+      this.setRights = true;
+      let { data } = await this.$axios.get("rights/tree");
+      this.rightsList = data.data;
+      this.filterRights(role, this.defKeys);
+    },
+    async setRightsCon() {
+      const treeKeys = [
+        ...this.$refs.treeRef.getCheckedKeys(),
+        ...this.$refs.treeRef.getHalfCheckedKeys(),
+      ];
+      const treeStr = treeKeys.join(",");
+      let { data } = await this.$axios.post(`roles/${this.roleId}/rights`, {
+        rids: treeStr,
+      });
+      this.getRolesLists();
+      this.setRights = false;
+    },
+    removeRoles(roleid, rightid) {
+      this.$confirm("此操作将永久删除该权限, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          let { data } = await this.$axios.delete(
+            `roles/${roleid.id}/rights/${rightid}`
+          );
+          this.$message({
+            type: "success",
+            message: "删除成功",
+          });
+          roleid.children = data.data;
+          console.log(roleid);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
     async getRolesLists() {
       let { data } = await this.$axios.get("roles");
       this.rolesLists = data.data;
     },
     addRolesCon() {
-      this.$refs.addRolesRef.validate(async val => {
+      this.$refs.addRolesRef.validate(async (val) => {
         if (!val) return;
         let { data } = await this.$axios.post("roles", this.addRolesForm);
         this.addRoles = false;
         this.$message({
           message: data.meta.msg,
-          type: "success"
+          type: "success",
         });
         this.getRolesLists();
       });
@@ -146,14 +236,14 @@ export default {
       let { data } = await this.$axios.delete("roles/" + id);
       this.$message({
         message: data.meta.msg,
-        type: "success"
+        type: "success",
       });
       this.getRolesLists();
-    }
+    },
   },
   created() {
     this.getRolesLists();
-  }
+  },
 };
 </script>
 

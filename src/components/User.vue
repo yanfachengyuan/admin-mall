@@ -102,6 +102,24 @@
           <el-button type="primary" @click="editUser">确 定</el-button>
         </span>
       </el-dialog>
+      <el-dialog title="角色配置" :visible.sync="config" width="50%">
+        <p>用户名：{{userInfo.username}}</p>
+        <p>用户名：{{userInfo.role_name}}</p>
+        <!-- <p>
+          <el-select v-model="value" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </p>-->
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="config = false">取 消</el-button>
+          <el-button type="primary" @click="config = false">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -129,8 +147,10 @@ export default {
       queryInfo: {
         query: "",
         pagenum: 1,
-        pagesize: 2
+        pagesize: 2,
       },
+      config: false,
+      userInfo: {},
       total: 0,
       tableData: [],
       dialogVisible: false,
@@ -139,27 +159,37 @@ export default {
         username: "",
         password: "",
         email: "",
-        mobile: ""
+        mobile: "",
       },
       editUserForm: {},
       addRules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 3, max: 10, message: "长度在 3 到 10 个字符", trigger: "blur" }
+          {
+            min: 3,
+            max: 10,
+            message: "长度在 3 到 10 个字符",
+            trigger: "blur",
+          },
         ],
         password: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 6, max: 15, message: "长度在 6 到 15 个字符", trigger: "blur" }
+          {
+            min: 6,
+            max: 15,
+            message: "长度在 6 到 15 个字符",
+            trigger: "blur",
+          },
         ],
         email: [
           { required: true, message: "请输入邮箱", trigger: "blur" },
-          { validator: checkEmail, trigger: "blur" }
+          { validator: checkEmail, trigger: "blur" },
         ],
         mobile: [
           { required: true, message: "请输入手机号", trigger: "blur" },
-          { validator: checkMobile, trigger: "blur" }
-        ]
-      }
+          { validator: checkMobile, trigger: "blur" },
+        ],
+      },
     };
   },
   created() {
@@ -167,7 +197,7 @@ export default {
   },
   methods: {
     editUser() {
-      this.$refs.editFormRef.validate(async val => {
+      this.$refs.editFormRef.validate(async (val) => {
         if (!val) return;
         let { data } = await this.$axios.put(
           "users/" + this.editUserForm.id,
@@ -175,7 +205,7 @@ export default {
         );
         this.$message({
           message: data.meta.msg,
-          type: "success"
+          type: "success",
         });
         this.editForm = false;
         this.getUsers();
@@ -194,7 +224,7 @@ export default {
       this.$confirm("此操作将永久删除该用户, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(async () => {
           let { data } = await this.$axios.delete("users/" + row.id);
@@ -202,18 +232,20 @@ export default {
           this.getUsers();
           this.$message({
             message: data.meta.msg,
-            type: "success"
+            type: "success",
           });
         })
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
     },
-    handelConfig(index, row) {
+    handleConfig(index, row) {
       console.log(index, row);
+      this.userInfo = row;
+      this.config = true;
     },
     handleCurrentChange(val) {
       this.queryInfo.pagenum = val;
@@ -231,7 +263,7 @@ export default {
       );
       this.$message({
         message: data.meta.msg,
-        type: "success"
+        type: "success",
       });
     },
     resetAdd() {
@@ -239,18 +271,18 @@ export default {
     },
     addUser() {
       console.log(this.$refs);
-      this.$refs.addForm.validate(async val => {
+      this.$refs.addForm.validate(async (val) => {
         if (!val) return;
         let { data } = await this.$axios.post("users", this.addForm);
         this.$message({
           message: data.meta.msg,
-          type: "success"
+          type: "success",
         });
         this.getUsers();
         this.dialogVisible = false;
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

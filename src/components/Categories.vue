@@ -100,34 +100,34 @@ export default {
       addCateForm: {
         cat_name: "",
         cat_pid: 0,
-        cat_level: 0,
+        cat_level: 0
       },
       queryInfo: {
         type: 3,
         pagenum: 1,
-        pagesize: 5,
+        pagesize: 5
       },
       categories: [],
       total: 0,
       addCateRules: {
         cat_pid: [
-          { required: true, message: "请输入父级分类ID", trigger: "blur" },
+          { required: true, message: "请输入父级分类ID", trigger: "blur" }
         ],
         cat_name: [
-          { required: true, message: "请输入分类名称", trigger: "blur" },
+          { required: true, message: "请输入分类名称", trigger: "blur" }
         ],
         cat_level: [
-          { required: true, message: "请输入分类层级", trigger: "blur" },
-        ],
+          { required: true, message: "请输入分类层级", trigger: "blur" }
+        ]
       },
       selectList: [],
       selectProps: {
         value: "cat_id",
         label: "cat_name",
-        children: "children",
+        children: "children"
       },
       selectListItem: [],
-      selectListId: [],
+      selectListId: []
     };
   },
   methods: {
@@ -135,20 +135,20 @@ export default {
       this.$confirm("此操作将永久删除该分类, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       })
         .then(async () => {
           let { data } = await this.$axios.delete(`categories/${id}`);
           this.getCategories();
           this.$message({
             message: data.meta.msg,
-            type: "success",
+            type: "success"
           });
         })
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除",
+            message: "已取消删除"
           });
         });
     },
@@ -158,7 +158,7 @@ export default {
     },
     handleChange(val) {
       if (val.length > 0) {
-        this.addCateForm.cat_pid = val[val - 1];
+        this.addCateForm.cat_pid = val[val.length - 1];
         this.addCateForm.cat_level = val.length;
         return;
       } else {
@@ -169,24 +169,23 @@ export default {
     async showAddCateForm() {
       this.addCate = true;
       let { data } = await this.$axios.get("categories", {
-        params: { type: 2 },
+        params: { type: 2 }
       });
       console.log(data.data);
       this.selectList = data.data;
     },
     async addCateCon() {
-      //   let { data } = await this.$axios.post("categories", this.addCateForm);
-      console.log(this.addCateForm);
+      let { data } = await this.$axios.post("categories", this.addCateForm);
       this.addCate = false;
-      //   this.$message({
-      //     message: data.meta.msg,
-      //     type: "success",
-      //   });
+      this.$message({
+        message: data.meta.msg,
+        type: "success"
+      });
       this.getCategories();
     },
     async getCategories() {
       let { data } = await this.$axios.get("categories", {
-        params: this.queryInfo,
+        params: this.queryInfo
       });
       this.categories = data.data.result;
       this.total = data.data.total;
@@ -198,11 +197,11 @@ export default {
     async handleCurrentChange(val) {
       this.queryInfo.pagenum = val;
       this.getCategories();
-    },
+    }
   },
   created() {
     this.getCategories();
-  },
+  }
 };
 </script>
 

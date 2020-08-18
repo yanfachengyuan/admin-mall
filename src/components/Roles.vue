@@ -126,41 +126,41 @@ export default {
       defKeys: [],
       rightsListProp: {
         label: "authName",
-        children: "children",
+        children: "children"
       },
       addRolesForm: {
         roleName: "",
-        roleDesc: "",
+        roleDesc: ""
       },
       addRolesRules: {
         roleName: [
           {
             required: true,
             message: "请输入角色名称",
-            trigger: "blur",
+            trigger: "blur"
           },
           {
             min: 3,
             max: 10,
             message: "请输入3-10个字符",
-            trigger: "blur",
-          },
+            trigger: "blur"
+          }
         ],
         roleDesc: [
           {
             required: true,
             message: "请输入角色描述",
-            trigger: "blur",
+            trigger: "blur"
           },
           {
             min: 3,
             max: 10,
             message: "请输入3-10个字符",
-            trigger: "blur",
-          },
-        ],
+            trigger: "blur"
+          }
+        ]
       },
-      roleId: "",
+      roleId: ""
     };
   },
   methods: {
@@ -168,7 +168,7 @@ export default {
       if (!node.children) {
         return arr.push(node.id);
       }
-      node.children.forEach((item) => {
+      node.children.forEach(item => {
         this.filterRights(item, arr);
       });
     },
@@ -183,11 +183,15 @@ export default {
     async setRightsCon() {
       const treeKeys = [
         ...this.$refs.treeRef.getCheckedKeys(),
-        ...this.$refs.treeRef.getHalfCheckedKeys(),
+        ...this.$refs.treeRef.getHalfCheckedKeys()
       ];
       const treeStr = treeKeys.join(",");
       let { data } = await this.$axios.post(`roles/${this.roleId}/rights`, {
-        rids: treeStr,
+        rids: treeStr
+      });
+      this.$message({
+        message: data.meta.msg,
+        type: "success"
       });
       this.getRolesLists();
       this.setRights = false;
@@ -196,7 +200,7 @@ export default {
       this.$confirm("此操作将永久删除该权限, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       })
         .then(async () => {
           let { data } = await this.$axios.delete(
@@ -204,7 +208,7 @@ export default {
           );
           this.$message({
             type: "success",
-            message: "删除成功",
+            message: "删除成功"
           });
           roleid.children = data.data;
           console.log(roleid);
@@ -212,7 +216,7 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除",
+            message: "已取消删除"
           });
         });
     },
@@ -221,13 +225,13 @@ export default {
       this.rolesLists = data.data;
     },
     addRolesCon() {
-      this.$refs.addRolesRef.validate(async (val) => {
+      this.$refs.addRolesRef.validate(async val => {
         if (!val) return;
         let { data } = await this.$axios.post("roles", this.addRolesForm);
         this.addRoles = false;
         this.$message({
           message: data.meta.msg,
-          type: "success",
+          type: "success"
         });
         this.getRolesLists();
       });
@@ -236,14 +240,14 @@ export default {
       let { data } = await this.$axios.delete("roles/" + id);
       this.$message({
         message: data.meta.msg,
-        type: "success",
+        type: "success"
       });
       this.getRolesLists();
-    },
+    }
   },
   created() {
     this.getRolesLists();
-  },
+  }
 };
 </script>
 

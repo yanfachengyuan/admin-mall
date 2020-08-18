@@ -105,19 +105,20 @@
       <el-dialog title="角色配置" :visible.sync="config" width="50%">
         <p>用户名：{{userInfo.username}}</p>
         <p>用户名：{{userInfo.role_name}}</p>
-        <!-- <p>
-          <el-select v-model="value" placeholder="请选择">
+        <p>
+          分配新角色
+          <el-select v-model="selectRoleId" placeholder="请选择">
             <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="item in rolesList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
             ></el-option>
           </el-select>
-        </p>-->
+        </p>
         <span slot="footer" class="dialog-footer">
           <el-button @click="config = false">取 消</el-button>
-          <el-button type="primary" @click="config = false">确 定</el-button>
+          <el-button type="primary" @click="saveRoles">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -144,6 +145,7 @@ export default {
       cb(new Error("请输入正确的手机号"));
     };
     return {
+      selectRoleId: "",
       queryInfo: {
         query: "",
         pagenum: 1,
@@ -190,12 +192,30 @@ export default {
           { validator: checkMobile, trigger: "blur" },
         ],
       },
+      rolesList: [],
     };
   },
   created() {
     this.getUsers();
   },
   methods: {
+    async saveRoles() {
+      if (!this.selectRoleId) {
+        return this.$message({
+          message: "请选择要分配的角色",
+          type: "warning",
+        });
+      }
+      let { data } = await this.$axios.put(`users/${this.userInfo.id}/role`, {
+        rid: this.selectRoleId,
+      });
+      this.$message({
+        message: data.meta.msg,
+        type: "success",
+      });
+      this.config = false;
+      this.getUsers();
+    },
     editUser() {
       this.$refs.editFormRef.validate(async (val) => {
         if (!val) return;
@@ -242,10 +262,11 @@ export default {
           });
         });
     },
-    handleConfig(index, row) {
-      console.log(index, row);
+    async handleConfig(index, row) {
       this.userInfo = row;
       this.config = true;
+      let { data } = await this.$axios.get("roles");
+      this.rolesList = data.data;
     },
     handleCurrentChange(val) {
       this.queryInfo.pagenum = val;
@@ -257,7 +278,6 @@ export default {
       this.total = data.data.total;
     },
     async switchState(userInfo) {
-      console.log(userInfo);
       let { data } = await this.$axios.put(
         `users/${userInfo.id}/state/${userInfo.mg_state}`
       );

@@ -73,6 +73,7 @@
             <div class="block">
               <el-cascader
                 clearable
+                change-on-select
                 v-model="selectListItem"
                 :options="selectList"
                 expandTrigger="hover"

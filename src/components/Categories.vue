@@ -137,7 +137,6 @@ export default {
     resetAddCateForm() {
       this.$refs.addCateRef.resetFields();
       this.addCate = false;
-      //   console.log(this.$refs.addCateRef);
     },
     async addCateCon() {
       let { data } = await this.$axios.post("categories", this.addCateForm);

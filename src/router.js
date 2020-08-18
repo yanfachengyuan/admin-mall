@@ -29,6 +29,21 @@ const router = new Router({
         }, {
           path: '/roles',
           component: () => import('./components/Roles')
+        }, {
+          path: '/categories',
+          component: () => import('./components/Categories')
+        }, {
+          path: '/params',
+          component: () => import('./components/Params')
+        }, {
+          path: '/goods',
+          component: () => import('./components/Goods')
+        }, {
+          path: '/orders',
+          component: () => import('./components/Order')
+        }, {
+          path: '/reports',
+          component: () => import('./components/Reports')
         }]
     }
   ]

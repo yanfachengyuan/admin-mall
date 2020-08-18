@@ -33,7 +33,7 @@
         </el-table-column>
         <el-table-column prop="cat_deleted" label="是否有效">
           <template slot-scope="scope">
-            <i :class="scope.row.cat_deleted===false?'el-icon-circle-check':'el-icon-circle-close'"></i>
+            <i :class="scope.row.cat_deleted===false?'el-icon-success':'el-icon-error'"></i>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -113,14 +113,26 @@ export default {
     };
   },
   methods: {
-    async reomveCate(id) {
-      let { data } = await this.$axios.delete(`categories/${id}`);
-      console.log(data);
-      this.getCategories();
-      this.$message({
-        message: data.meta.msg,
-        type: "success",
-      });
+    reomveCate(id) {
+      this.$confirm("此操作将永久删除该分类, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          let { data } = await this.$axios.delete(`categories/${id}`);
+          this.getCategories();
+          this.$message({
+            message: data.meta.msg,
+            type: "success",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
     resetAddCateForm() {
       this.$refs.addCateRef.resetFields();
@@ -129,8 +141,11 @@ export default {
     },
     async addCateCon() {
       let { data } = await this.$axios.post("categories", this.addCateForm);
-      console.log(data);
       this.addCate = false;
+      this.$message({
+        message: data.meta.msg,
+        type: "success",
+      });
       this.getCategories();
     },
     async getCategories() {
@@ -163,10 +178,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.el-icon-circle-check {
+.el-icon-success {
   color: #67c23a;
 }
-.el-icon-circle-close {
+.el-icon-error {
   color: #ec0000;
 }
 </style>

@@ -12,7 +12,7 @@
     <el-card>
       <el-row>
         <el-col>
-          <el-button type="primary" @click="addCate=true">添加分类</el-button>
+          <el-button type="primary" @click="showAddCateForm">添加分类</el-button>
         </el-col>
       </el-row>
       <el-table
@@ -52,7 +52,7 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage"
+        :current-page="queryInfo.pagenum"
         :page-sizes="[5, 10, 15, 20]"
         :page-size="queryInfo.pagesize"
         layout="total, sizes, prev, pager, next, jumper"
@@ -66,14 +66,20 @@
           label-width="100px"
           class="demo-ruleForm"
         >
-          <el-form-item label="父级分类ID" prop="cat_pid">
-            <el-input v-model="addCateForm.cat_pid"></el-input>
-          </el-form-item>
           <el-form-item label="分类名称" prop="cat_name">
             <el-input v-model="addCateForm.cat_name"></el-input>
           </el-form-item>
-          <el-form-item label="分类层级" prop="cat_level">
-            <el-input v-model="addCateForm.cat_level"></el-input>
+          <el-form-item label="父级分类">
+            <div class="block">
+              <el-cascader
+                clearable
+                v-model="selectListItem"
+                :options="selectList"
+                expandTrigger="hover"
+                :props="selectProps"
+                @change="handleChange"
+              ></el-cascader>
+            </div>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -90,7 +96,11 @@ export default {
   data() {
     return {
       addCate: false,
-      addCateForm: {},
+      addCateForm: {
+        cat_name: "",
+        cat_pid: 0,
+        cat_level: 0,
+      },
       queryInfo: {
         type: 3,
         pagenum: 1,
@@ -98,7 +108,6 @@ export default {
       },
       categories: [],
       total: 0,
-      currentPage: 1,
       addCateRules: {
         cat_pid: [
           { required: true, message: "请输入父级分类ID", trigger: "blur" },
@@ -110,6 +119,14 @@ export default {
           { required: true, message: "请输入分类层级", trigger: "blur" },
         ],
       },
+      selectList: [],
+      selectProps: {
+        value: "cat_id",
+        label: "cat_name",
+        children: "children",
+      },
+      selectListItem: [],
+      selectListId: [],
     };
   },
   methods: {
@@ -138,13 +155,32 @@ export default {
       this.$refs.addCateRef.resetFields();
       this.addCate = false;
     },
-    async addCateCon() {
-      let { data } = await this.$axios.post("categories", this.addCateForm);
-      this.addCate = false;
-      this.$message({
-        message: data.meta.msg,
-        type: "success",
+    handleChange(val) {
+      if (val.length > 0) {
+        this.addCateForm.cat_pid = val[val - 1];
+        this.addCateForm.cat_level = val.length;
+        return;
+      } else {
+        this.addCateForm.cat_pid = 0;
+        this.addCateForm.cat_level = 0;
+      }
+    },
+    async showAddCateForm() {
+      this.addCate = true;
+      let { data } = await this.$axios.get("categories", {
+        params: { type: 2 },
       });
+      console.log(data.data);
+      this.selectList = data.data;
+    },
+    async addCateCon() {
+      //   let { data } = await this.$axios.post("categories", this.addCateForm);
+      console.log(this.addCateForm);
+      this.addCate = false;
+      //   this.$message({
+      //     message: data.meta.msg,
+      //     type: "success",
+      //   });
       this.getCategories();
     },
     async getCategories() {
@@ -156,18 +192,11 @@ export default {
     },
     async handleSizeChange(val) {
       this.queryInfo.pagesize = val;
-      let { data } = await this.$axios.get("categories", {
-        params: this.queryInfo,
-      });
-      this.categories = data.data.result;
-      console.log(data);
+      this.getCategories();
     },
     async handleCurrentChange(val) {
       this.queryInfo.pagenum = val;
-      let { data } = await this.$axios.get("categories", {
-        params: this.queryInfo,
-      });
-      this.categories = data.data.result;
+      this.getCategories();
     },
   },
   created() {

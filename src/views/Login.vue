@@ -28,12 +28,12 @@ export default {
     return {
       form: {
         username: "admin",
-        password: "123456"
+        password: "123456",
       },
       loginRules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
@@ -41,10 +41,10 @@ export default {
             min: 6,
             max: 10,
             message: "长度在 6 到 10 个字符",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   methods: {
@@ -53,14 +53,11 @@ export default {
       window.sessionStorage.setItem("token", data.data.token);
       this.$message({
         message: data.meta.msg,
-        type: "success"
+        type: "success",
       });
       this.$router.push("/home");
     },
-    reset() {
-      console.log(this.ref);
-    }
-  }
+  },
 };
 </script>
 

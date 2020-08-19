@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 Vue.use(Router)
 const router = new Router({
   routes: [
@@ -52,6 +54,10 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/login') return next()
   let token = window.sessionStorage.getItem('token')
   if (!token) return next('/login')
+  NProgress.start()
   next()
+})
+router.afterEach(() => {
+  NProgress.done()
 })
 export default router

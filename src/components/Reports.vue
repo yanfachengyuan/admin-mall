@@ -55,7 +55,6 @@ export default {
   },
   async mounted() {
     let { data } = await this.$axios.get("reports/type/1");
-    console.log(data);
     const myChart = echarts.init(document.getElementById("myEcharts"));
 
     const result = _.merge(data.data, this.options);

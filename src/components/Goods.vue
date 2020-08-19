@@ -41,7 +41,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="queryInfo.pagenum"
-        :page-sizes="[50, 100, 200]"
+        :page-sizes="[10,50, 100, 200]"
         :page-size="queryInfo.pagesize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
@@ -197,7 +197,6 @@ export default {
       this.total = data.data.total;
     },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
       this.queryInfo.pagesize = val;
       this.getGoods();
     },
